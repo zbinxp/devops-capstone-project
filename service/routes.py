@@ -22,6 +22,8 @@ def health():
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route("/")
 def index():
     """Root URL response"""
@@ -38,6 +40,8 @@ def index():
 ######################################################################
 # CREATE A NEW ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts", methods=["POST"])
 def create_accounts():
     """
@@ -61,6 +65,7 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
+
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
     """List all accounts"""
@@ -77,17 +82,19 @@ def list_accounts():
 # READ AN ACCOUNT
 ######################################################################
 
+
 @app.route("/accounts/<int:id>", methods=["GET"])
 def read_account(id):
     """Read account with specific id"""
     acc = Account.find(id)
     if not acc:
         return f"account with id={id} not found", status.HTTP_404_NOT_FOUND
-    return acc.serialize(), status.HTTP_200_OK    
+    return acc.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
+
 
 @app.route("/accounts/<int:id>", methods=["PUT"])
 def update_account(id):
@@ -97,11 +104,12 @@ def update_account(id):
         return f"account with id={id} not found", status.HTTP_404_NOT_FOUND
     acc.deserialize(request.get_json())
     acc.update()
-    return acc.serialize(), status.HTTP_200_OK        
+    return acc.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
+
 
 @app.route("/accounts/<int:id>", methods=["DELETE"])
 def delete_account(id):
