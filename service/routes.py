@@ -61,29 +61,56 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
-
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """List all accounts"""
+    accounts = Account.all()
+    app.logger.info(f"list accounts, count={len(accounts)}")
+    if len(accounts) == 0:
+        return make_response(jsonify([]), status.HTTP_200_OK)
+    results = [acc.serialize() for acc in accounts]
+    return make_response(
+        jsonify(results), status.HTTP_200_OK
+    )
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
-
+@app.route("/accounts/<int:id>", methods=["GET"])
+def read_account(id):
+    """Read account with specific id"""
+    acc = Account.find(id)
+    if not acc:
+        return f"account with id={id} not found", status.HTTP_404_NOT_FOUND
+    return acc.serialize(), status.HTTP_200_OK    
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
-
+@app.route("/accounts/<int:id>", methods=["PUT"])
+def update_account(id):
+    """Update the account with specific id"""
+    acc = Account.find(id)
+    if not acc:
+        return f"account with id={id} not found", status.HTTP_404_NOT_FOUND
+    acc.deserialize(request.get_json())
+    acc.update()
+    return acc.serialize(), status.HTTP_200_OK        
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
 
-# ... place you code here to DELETE an account ...
-
+@app.route("/accounts/<int:id>", methods=["DELETE"])
+def delete_account(id):
+    """Delete account with specific id"""
+    acc = Account.find(id)
+    if not acc:
+        return f"account with id={id} not found", status.HTTP_404_NOT_FOUND
+    acc.delete()
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

@@ -124,3 +124,68 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
+    def test_list_accounts(self):
+        """It should return all accounts with status code 200"""
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.get_json()), 0)
+
+        num = 5
+        self._create_accounts(num)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.get_json()), num)
+
+    def test_read_account(self):
+        """It should return account with id"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)    
+        acc = self._create_accounts(1)[0]
+        response = self.client.get(f"{BASE_URL}/{acc.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_account = response.get_json()
+        self.assertEqual(new_account["name"], acc.name)
+        self.assertEqual(new_account["email"], acc.email)
+        self.assertEqual(new_account["address"], acc.address)
+        self.assertEqual(new_account["phone_number"], acc.phone_number)
+        self.assertEqual(new_account["date_joined"], str(acc.date_joined))
+
+    def test_update_account(self):
+        """It should update account with id"""
+        acc = self._create_accounts(1)[0]
+        acc.name = "testing"
+        response = self.client.put(
+            f"{BASE_URL}/{acc.id}",
+            json=acc.serialize()
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_account = response.get_json()
+        self.assertEqual(new_account["name"], acc.name)
+        response = self.client.get(f"{BASE_URL}/{acc.id}")
+        new_account = response.get_json()
+        self.assertEqual(new_account["name"], acc.name)
+
+    def test_update_account_missing_id(self):
+        """It should return id not found"""
+        acc = self._create_accounts(1)[0]
+        acc.name = "testing"
+        response = self.client.put(
+            f"{BASE_URL}/{acc.id-1}",
+            json=acc.serialize()
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_account(self):
+        """It should delete account with specific id"""
+        acc = self._create_accounts(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{acc.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self.client.get(f"{BASE_URL}/{acc.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_account_missing_id(self):
+        """It should return not found"""
+        acc = self._create_accounts(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{acc.id-1}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
