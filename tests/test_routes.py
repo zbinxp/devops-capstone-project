@@ -142,7 +142,7 @@ class TestAccountService(TestCase):
     def test_read_account(self):
         """It should return account with id"""
         response = self.client.get(f"{BASE_URL}/0")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)    
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         acc = self._create_accounts(1)[0]
         response = self.client.get(f"{BASE_URL}/{acc.id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -191,7 +191,7 @@ class TestAccountService(TestCase):
         acc = self._create_accounts(1)[0]
         response = self.client.delete(f"{BASE_URL}/{acc.id-1}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_security_header(self):
         """It should return security headers"""
         response = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
@@ -202,7 +202,7 @@ class TestAccountService(TestCase):
             'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         }
-        for k,v in headers.items():
+        for k, v in headers.items():
             self.assertEqual(response.headers.get(k), v)
 
     def test_cors_security(self):
